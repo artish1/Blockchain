@@ -141,6 +141,9 @@ def mine():
 
     return jsonify(response), 200
 
+@app.route("/mine", methods=["POST"])
+def mine_receive():
+    
 
 @app.route("/last_block", methods=["GET"])
 def get_last_block():

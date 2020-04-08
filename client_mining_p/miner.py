@@ -3,6 +3,7 @@ import requests
 
 import sys
 import json
+from random import random
 
 
 def proof_of_work(block):
@@ -14,8 +15,10 @@ def proof_of_work(block):
     :return: A valid proof for the provided block
     """
     block_string = json.dumps(block, sort_keys=True)
-
-    pass
+    proof = random()
+    while not valid_proof(block_string, proof):
+        proof = random()
+    return proof
 
 
 def valid_proof(block_string, proof):

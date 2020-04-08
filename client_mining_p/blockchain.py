@@ -141,9 +141,25 @@ def mine():
 
     return jsonify(response), 200
 
+
 @app.route("/mine", methods=["POST"])
 def mine_receive():
-    
+    data = request.get_json()
+    if not data["proof"] or not data["id"]:
+        response = {"message": "body must contain proof and id fields"}
+        return jsonify(response), 400
+    else:
+        block_string = json.dumps(blockchain.last_block, sort_keys=True)
+        valid = blockchain.valid_proof(block_string, data["proof"])
+        if valid:
+            blockchain.new_block(data["proof"])
+            response = {"message": "New Block Forged"}
+
+        else:
+            response = {"message": "Invalid proof"}
+
+        return jsonify(response), 200
+
 
 @app.route("/last_block", methods=["GET"])
 def get_last_block():

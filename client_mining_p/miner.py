@@ -3,6 +3,7 @@ import requests
 
 import sys
 import json
+from random import random
 
 
 def proof_of_work(block):
@@ -13,7 +14,11 @@ def proof_of_work(block):
     in an effort to find a number that is a valid proof
     :return: A valid proof for the provided block
     """
-    pass
+    block_string = json.dumps(block, sort_keys=True)
+    proof = random()
+    while not valid_proof(block_string, proof):
+        proof = random()
+    return proof
 
 
 def valid_proof(block_string, proof):
@@ -27,10 +32,13 @@ def valid_proof(block_string, proof):
     correct number of leading zeroes.
     :return: True if the resulting hash is a valid proof, False otherwise
     """
-    pass
+
+    guess = f"{block_string}{proof}".encode()
+    guess_hash = hashlib.sha256(guess).hexdigest()
+    return guess_hash[:6] == "000000"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # What is the server address? IE `python3 miner.py https://server.com/api/`
     if len(sys.argv) > 1:
         node = sys.argv[1]
@@ -57,12 +65,22 @@ if __name__ == '__main__':
 
         # TODO: Get the block from `data` and use it to look for a new proof
         # new_proof = ???
-
+        print("Getting last block...")
+        print(f"Data: {data}")
+        last_block = data["last_block"]
+        print(f"last block: {last_block}")
+        print("Starting new proof of work...")
+        new_proof = proof_of_work(last_block)
+        print("Finished new proof of work.")
+        print(f"Proof: {new_proof}")
         # When found, POST it to the server {"proof": new_proof, "id": id}
+        print("Sending proof to server...")
         post_data = {"proof": new_proof, "id": id}
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
+        print("Received response: ")
+        print(data)
 
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
